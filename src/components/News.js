@@ -8,21 +8,26 @@ export class News extends Component {
         this.state ={
             articles: [],
             loading: false,
+            page:1,
         }
     }
 
     async componentDidMount(){
-        let url = "https://newsapi.org/v2/top-headlines?country=in&apiKey=0c55548f8440447695ba41cebe9556b3";
+        let url = "https://newsapi.org/v2/everything?q=in&apiKey=0c55548f8440447695ba41cebe9556b3&page=1&pageSize=28";
         let data = await fetch(url);
         let parsedData = await data.json();
-        console.log(parsedData);
-        this.setState({articles: parsedData.articles})
+        this.setState({
+            articles: parsedData.articles,
+            totalResults: parsedData.totalResults
+        })
     }
 
     handlePrevClick =  async() =>{
-        let url = `https://newsapi.org/v2/top-headlines?country=in&apiKey=0c55548f8440447695ba41cebe9556b3&page-${this.state.page - 1}`;
+        console.log("prev")
+        let url = `https://newsapi.org/v2/everything?q=in&apiKey=0c55548f8440447695ba41cebe9556b3&page=${this.state.page - 1}&pageSize=28`;
         let data = await fetch(url);
         let parsedData = await data.json();
+        console.log(parsedData);
         this.setState({
             page: this.state.page - 1,
             articles: parsedData.articles
@@ -30,31 +35,36 @@ export class News extends Component {
     }
 
     handleNextClick = async() => {
-        let url = `https://newsapi.org/v2/top-headlines?country=in&apiKey=0c55548f8440447695ba41cebe9556b3&page-${this.state.page + 1}`;
-        let data = await fetch(url);
-        let parsedData = await data.json();
-        this.setState({
-            page: this.state.page + 1,
-            articles: parsedData.articles
-        })
+        console.log("next")
+        if((this.state.page + 1) <= Math.ceil((this.state.totalResults)/28)){
+            console.log(this.state.totalResults)
+            let url = `https://newsapi.org/v2/everything?q=in&apiKey=0c55548f8440447695ba41cebe9556b3&page=${this.state.page + 1}&pageSize=28`;
+            let data = await fetch(url);
+            let parsedData = await data.json();
+            console.log(parsedData);
+            this.setState({
+                page: this.state.page + 1,
+                articles: parsedData.articles
+            })
+        } 
     }
     
 
   render() {
     return (
-      <div className='container my-3'>
-        <h2>VigyaNews - Top Headlines</h2>
+      <div className='container my-3 flex-col'>
+        <h3>VigyaNews</h3>
 
         <div className="row">
             {this.state.articles.map((element)=>{
-                return <div className="col-md-4" key={element.url}>
-                    <NewsItem title={element.title?element.title.slice(0,45):""} description={element.description?element.description.slice(0,88):""} imageUrl={element.urlToImage} newsUrl={element.url}/> 
+                return <div className="col-md-3" key={element.url}>
+                    <NewsItem title={element.title} description={element.description} imageUrl={element.urlToImage} newsUrl={element.url}/> 
                 </div>
             })}
         </div>
-        <div className="container d-flex justify-content-center my-5">
-            <button disabled={this.state.page<=1} type="button" className="btn btn-dark mx-2" onClick={this.handlePrevClick}>&larr; Previous</button>
-            <button type="button" className="btn btn-dark mx-2" onClick={this.handleNextClick}>Next &rarr;</button>
+        <div className="container d-flex justify-content-around my-5">
+            <button disabled={this.state.page<=1} type="button" className="btn btn-dark" onClick={this.handlePrevClick}>&larr; Previous</button>
+            <button disabled={(this.state.page) >= 3} type="button" className="btn btn-dark" onClick={this.handleNextClick}>Next &rarr;</button>
         </div>
       </div>
     )

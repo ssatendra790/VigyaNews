@@ -1,8 +1,21 @@
 import React, { Component } from 'react'
 import NewsItem from './NewsItem'
 import CircularIndeterminate from './CircularIndeterminate';
+import PropTypes from 'prop-types'
 
 export class News extends Component {
+
+    static defaultProps = {
+        country: "in",
+        pageSize: 8,
+        category: "general",
+    }
+    static propsTypes = {
+        country: PropTypes.string,
+        pageSize: PropTypes.number,
+        category: PropTypes.string,
+    }
+
     constructor(){
         super();
         this.state ={
@@ -14,7 +27,7 @@ export class News extends Component {
     }
 
     async componentDidMount(){
-        let url = `https://newsapi.org/v2/everything?q=in&apiKey=ba6a9fff6e87435c89487f2b6ab08fc6&page=1&pageSize=${this.props.pageSize}`;
+        let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=ba6a9fff6e87435c89487f2b6ab08fc6&page=1&pageSize=${this.props.pageSize}`;
         
         this.setState({loading: true});
 
@@ -29,7 +42,7 @@ export class News extends Component {
     }
 
     handlePrevClick =  async() =>{
-        let url = `https://newsapi.org/v2/everything?q=in&apiKey=ba6a9fff6e87435c89487f2b6ab08fc6&page=${this.state.page - 1}&pageSize=${this.props.pageSize}`;
+        let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=ba6a9fff6e87435c89487f2b6ab08fc6&page=${this.state.page - 1}&pageSize=${this.props.pageSize}`;
 
         this.setState({loading: true});
 
@@ -47,7 +60,7 @@ export class News extends Component {
 
         if((this.state.page + 1) <= Math.ceil(this.state.totalResults/this.props.pageSize)){
             console.log(this.state.totalResults)
-            let url = `https://newsapi.org/v2/everything?q=in&apiKey=ba6a9fff6e87435c89487f2b6ab08fc6&page=${this.state.page + 1}&pageSize=${this.props.pageSize}`;
+            let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=ba6a9fff6e87435c89487f2b6ab08fc6&page=${this.state.page + 1}&pageSize=${this.props.pageSize}`;
 
             this.setState({loading: true});
 
@@ -74,14 +87,14 @@ export class News extends Component {
 
         <div className="row">
             {!this.state.loading && this.state.articles.map((element)=>{
-                return <div className="col-md-3" key={element.url}>
+                return <div className="col-md-4" key={element.url}>
                     <NewsItem title={element.title} description={element.description} imageUrl={element.urlToImage} newsUrl={element.url}/> 
                 </div>
             })}
         </div>
         <div className="container d-flex justify-content-around my-5">
             <button disabled={this.state.page <= 1} type="button" className="btn btn-dark" onClick={this.handlePrevClick}>&larr; Previous</button>
-            <button disabled={this.state.page >= 9} type="button" className="btn btn-dark" onClick={this.handleNextClick}>Next &rarr;</button>
+            <button disabled={this.state.page >= 9 || (this.state.page + 1) > Math.ceil(this.state.totalResults/this.props.pageSize)} type="button" className="btn btn-dark" onClick={this.handleNextClick}>Next &rarr;</button>
         </div>  
       </div>
     )

@@ -1,4 +1,5 @@
 0c55548f8440447695ba41cebe9556b3
+ba6a9fff6e87435c89487f2b6ab08fc6
 
 
 //we can use belo in news.js file 
